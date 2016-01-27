@@ -103,6 +103,21 @@ function Data(){
 	
 	this.addData = function(newValue) {
 		this[newValue.key] = newValue;
+		/*-------------------------------------------------------------------------------*/
+		//Add the getter and setter functions that are called when newValue is manipulated
+		//THIS CODE MAKES THE OBJECT ITSELF IN ACCESSABLE -- You can
+		Object.defineProperty(this, newValue.key, {
+			get: function() {
+				// Add event listeners to newValue: Called when newValue is accessed 
+				return newValue.getListener();
+			},
+			set: function(val) {
+				// Add event listeners to newValue: Called when newValue is set 
+				newValue.setListener(val);
+			}
+		});
+		//Add the getter and setter functions that are called when newValue is manipulated
+	/*-------------------------------------------------------------------------------*/
 	}
 	
 	this.init();
@@ -118,22 +133,8 @@ function domElement(){
 	}
 	
 	this.newValue = function(newValue) {
-	/*-------------------------------------------------------------------------------*/
-		//Add the getter and setter functions that are called when newValue is manipulated
-		//THIS CODE MAKES THE OBJECT ITSELF IN ACCESSABLE -- You can
-		Object.defineProperty(Data.prototype, newValue.key, {
-			get: function() {
-				// Add event listeners to newValue: Called when newValue is accessed 
-				return newValue.getListener();
-			},
-			set: function(val) {
-				// Add event listeners to newValue: Called when newValue is set 
-				newValue.setListener(val);
-			}
-		});
-		//Add the getter and setter functions that are called when newValue is manipulated
-	/*-------------------------------------------------------------------------------*/
 		this.addData(newValue);
+	
 	}
 
 	this.init();
