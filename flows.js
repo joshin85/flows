@@ -100,13 +100,16 @@ function Data(){
 		Observer.registerListeners(this);
 	}
 	
+	/* deprecated */
 	this.dataChange = function() {
 		//When a data Var from this DataContainer is changed this event is called...
 		//document.getElementById("test").textContent = this.getVar(); 
 	}
 	
+	
+
 	this.addData = function(newVar, varName) {
-	//If passed object with superclass of listenerMethods construct then add new variable to Data Object ELSE assume newVar needs to be constructed; 
+	//If passed object with prototype of listenerMethods then add new variable to Data Object ELSE assume newVar needs to be constructed; 
 		if(typeof newVar != typeof undefined && newVar.constructor.name == "listenerMethods") {
 			this[newVar.key] = newVar;
 		} else if(typeof varName != typeof undefined) {
@@ -114,10 +117,9 @@ function Data(){
 			this[varName] = newVar;
 		} else 
 			console.error("This function requires an input whose prototype is listenerMethods or a value key pair : addData(value, key)");		
-		
 	/*-------------------------------------------------------------------------------*/
 		//Add the getter and setter functions that are called when newVar is manipulated
-		//THIS CODE MAKES THE OBJECT ITSELF IN ACCESSABLE -- You can
+		//THIS CODE MAKES THE OBJECT ITSELF IN ACCESSABLE -- You can access the object only if you instantiate it outside of the object 
 		Object.defineProperty(this, newVar.key, {
 			get: function() {
 				// Add event listeners to newVar: Called when newVar is accessed 
@@ -130,6 +132,8 @@ function Data(){
 		});
 		//Add the getter and setter functions that are called when newVar is manipulated
 	/*-------------------------------------------------------------------------------*/
+console.log(newVar.key);
+		this[newVar.key] = newVar.Var;
 	}
 	
 	this.init();
@@ -172,7 +176,7 @@ domElement.prototype = new Data();
 function domElement(){
 	
 	this.init = function() {
-		this.prototype = new Data();
+		
 	}
 	
 	this.newVar = function(newVar, varName) {
@@ -180,7 +184,7 @@ function domElement(){
 	}
 		
 	this.domAnalyzer = function(target) {
-		
+		//This will be used for parsing dom -- will replace data-flows method
 	}
 	
 	this.domStyle = new domStyle();
