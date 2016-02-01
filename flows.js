@@ -193,7 +193,7 @@ function domStyle(ParentObject, id){
 		this.init(key, value);
 	}
 	
-	this.newProperty = function(key, value) {
+	this.css = function(key, value) {
 		var newProp = new property(key, value, this);
 		newProp.setChangeListener(this.generateStyle);
 		this.addData(newProp);
