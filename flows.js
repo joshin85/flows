@@ -47,8 +47,12 @@ function listenerMethods(){
 
 	}
 	
+	this.getObj = function(){
+		return this;
+	}
+	
 	this.getListener = function() {
-		return this[this.key] ;
+		return this[this.key];
 	}
 	
 	this.setListener = function(Var) {
@@ -87,6 +91,20 @@ function Variable(key, Var){
 		/**/
 	}	
 	
+	this.setChangeListener = function(newChangeListener){
+		if(typeof newChangeListener == typeof Function)
+			this.setListener = newChangeListener;
+		else 
+			console.error("This function required an input of type function, was passed typeof : " + typeof newChangeListener);
+	}
+	
+	this.setGetListener = function(newGetListener){
+		if(typeof newGetListener == typeof Function)
+			this.setListener = newGetListener;
+		else 
+			console.error("This function required an input of type function, was passed typeof : " + typeof newGetListener);
+	}
+	
 	this.init(key, Var);
 	this.key;
 	this.Var; 
@@ -100,14 +118,16 @@ function Data(){
 		Observer.registerListeners(this);
 	}
 	
+	this.getObj = function(key){
+		return this[key];
+	}
+	
 	/* deprecated */
 	this.dataChange = function() {
 		//When a data Var from this DataContainer is changed this event is called...
 		//document.getElementById("test").textContent = this.getVar(); 
 	}
 	
-	
-
 	this.addData = function(newVar, varName) {
 	//If passed object with prototype of listenerMethods then add new variable to Data Object ELSE assume newVar needs to be constructed; 
 		if(typeof newVar != typeof undefined && newVar.constructor.name == "listenerMethods") {
@@ -132,7 +152,6 @@ function Data(){
 		});
 		//Add the getter and setter functions that are called when newVar is manipulated
 	/*-------------------------------------------------------------------------------*/
-console.log(newVar.key);
 		this[newVar.key] = newVar.Var;
 	}
 	
@@ -140,40 +159,59 @@ console.log(newVar.key);
 	
 }
 
+
 domStyle.prototype = new Data(); 
-function domStyle(){
-	/** /
-	//Ints
-	this.top;
-	this.left;
-	this.bottom;
-	this.right;
-	//Strings
-	this.displayType = "";
-	this.class = "";
+function domStyle(ParentObject, id){
+	
 	this.style = "";
 	
-	this.generateStyle = function(){
-		
+	this.generateStyle = function(val){
+		var newStyle = "";
+		var parentObj = this.ParentObject;
+		this.Var = val;
+		this[this.key] = val;
+		//console.log(parentObj);
+		Object.keys(parentObj).forEach(function(key,index) {
+			
+			var objProp = parentObj[key];
+			//console.log(objProp.constructor.name + " = " + objProp);
+			if(typeof objProp == typeof "" && objProp != null && key != "style") {
+				console.log(objProp)
+				newStyle += key + " : " + objProp + ";" ;
+			}
+		});
+		//console.log(newStyle);
+		parentObj.style = newStyle;
+		console.log(document.getElementById(parentObj.id));
+		document.getElementById(parentObj.id).style = parentObj.style;
+		//console.log(this.style);
 	}
 	
-	this.init = function(){
-		this.addData("top", "");
-		this.addData("left", "");
-		this.addData("bottom", "");
-		this.addData("right", "");
-		this.addData("displayType", "");
-		this.addData("style", "");
-		this.addData("class", "");
+	property.prototype = new Variable();
+	function property(key, value, ParentObject){
+		this.ParentObject = ParentObject;
+		this.init(key, value);
 	}
 	
-	this.init();
+	this.newProperty = function(key, value) {
+		var newProp = new property(key, value, this);
+		newProp.setChangeListener(this.generateStyle);
+		this.addData(newProp);
+	}
+	
+	this.init = function(ParentObject, id){
+		this.id = id;
+		this.ParentObject = ParentObject;		
+	}
+	
+	
+	this.init(ParentObject, id);
 	/**/
 } 
 
 //Add Prototype
 domElement.prototype = new Data();
-function domElement(){
+function domElement(target){
 	
 	this.init = function() {
 		
@@ -187,7 +225,8 @@ function domElement(){
 		//This will be used for parsing dom -- will replace data-flows method
 	}
 	
-	this.domStyle = new domStyle();
+	this.classNames = "";
+	this.style = new domStyle(this, target);
 	this.currentStage;
 	this.stageList;
 

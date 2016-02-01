@@ -1,8 +1,8 @@
-var clock = new domElement();
+var clock = new domElement("clock");
 
-var seconds = new Variable("seconds", 60);
-var minutes = new Variable("minutes", 60);
-var hours = new Variable("hours", 60);
+var seconds = new Variable("seconds", 59);
+var minutes = new Variable("minutes", 59);
+var hours = new Variable("hours", 23);
 
 clock.newVar(seconds);
 clock.newVar(minutes);
