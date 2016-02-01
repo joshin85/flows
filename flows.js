@@ -158,7 +158,41 @@ function Data(){
 	this.init();
 	
 }
-
+/* buggy */
+domClasses.prototype = new Data();
+function domClasses(ParentObject, id){
+	
+	this.classes = "";
+	
+	this.updateClass = function(){
+		document.getElementById(this.id).className = this.classes;
+	}
+	
+	this.addClass = function(className) {
+		this.classes +=  className + " ";
+		this.updateClass();
+	}
+	
+	this.removeClass = function(className) {
+		this.classes = this.classes.replace(className + " ", " ");
+		this.updateClass();
+	}
+	
+	this.init = function(id){
+		this.id = id;
+		var classString  = document.getElementById(id).className;
+		var currentClasses = classString.split(" ");
+		var numClasses = currentClasses.length;
+		console.log(currentClasses);
+		for (i = 0; i < numClasses; i++){
+			console.log(currentClasses[i]);
+			this.addClass(currentClasses[i]);
+		}
+	}
+	
+	this.init(id);
+	
+}
 
 domStyle.prototype = new Data(); 
 function domStyle(ParentObject, id){
@@ -170,21 +204,14 @@ function domStyle(ParentObject, id){
 		var parentObj = this.ParentObject;
 		this.Var = val;
 		this[this.key] = val;
-		//console.log(parentObj);
 		Object.keys(parentObj).forEach(function(key,index) {
-			
 			var objProp = parentObj[key];
-			//console.log(objProp.constructor.name + " = " + objProp);
 			if(typeof objProp == typeof "" && objProp != null && key != "style") {
-				console.log(objProp)
 				newStyle += key + " : " + objProp + ";" ;
 			}
 		});
-		//console.log(newStyle);
 		parentObj.style = newStyle;
-		console.log(document.getElementById(parentObj.id));
 		document.getElementById(parentObj.id).style = parentObj.style;
-		//console.log(this.style);
 	}
 	
 	property.prototype = new Variable();
@@ -225,7 +252,19 @@ function domElement(target){
 		//This will be used for parsing dom -- will replace data-flows method
 	}
 	
-	this.classNames = "";
+	this.css = function(key, target) {
+		this.style.css(key, target);
+	}
+	
+	this.addClass = function(className){
+		this.classes.addClass(className);
+	}
+	
+	this.removeClass = function(className){
+		this.classes.removeClass(className);
+	}
+	
+	this.classes = new domClasses(this, target);
 	this.style = new domStyle(this, target);
 	this.currentStage;
 	this.stageList;
