@@ -58,7 +58,10 @@ function listenerMethods(){
 	this.setListener = function(Var) {
 		this[this.key] = Var ;
 		this.Var = Var ;
-		
+		this.onChange();
+	}
+	
+	this.onChange = function(){
 		/*This functionality will be replaced by a non dom based parse so that parent elements for variables arent required and the dom is not inflated by to much */
 		//Select ALL dom elements with data attribute of this Variable Key 
 		var domArray = document.querySelectorAll('[data-' + Observer.antecedent + '-' + this.key + ']')
@@ -241,7 +244,11 @@ domElement.prototype = new Data();
 function domElement(target){
 	
 	this.init = function() {
-		
+		this.flow = [];
+		this.classes = new domClasses(this, target);
+		this.style = new domStyle(this, target);
+		this.currentStage;
+		this.stageList;
 	}
 	
 	this.newVar = function(newVar, varName) {
@@ -250,6 +257,15 @@ function domElement(target){
 		
 	this.domAnalyzer = function(target) {
 		//This will be used for parsing dom -- will replace data-flows method
+	}
+	
+	this.updateAll = function(){
+		Object.keys(this).forEach(function(key,index) {
+			var objProp = this[key];
+			if(objProp instanceof Variable){
+				objProp.onChange();
+			}
+		});
 	}
 	
 	this.css = function(key, target) {
@@ -263,11 +279,45 @@ function domElement(target){
 	this.removeClass = function(className){
 		this.classes.removeClass(className);
 	}
+				
+	/* Not sure if this is useful yet development paused */
+	this.setStage = function(stage) {
+		if(typeof stage == "Number"){
+			stage = flow[stage];
+		} else if(typeof stage == "Object") {
+			stage = stage;
+		}
+		
+		this.updateDataObject(stage);
+		
+	}
 	
-	this.classes = new domClasses(this, target);
-	this.style = new domStyle(this, target);
+	this.addStage = function(newStage){
+		flow.push(newStage);
+	}
+
+	this.flow;
+	this.classes;
+	this.style;
 	this.currentStage;
 	this.stageList;
-
+	
 	this.init();
+}
+
+function ActiveElement(target){
+
+	this.init = function(target) {
+		this.Element = new domElement(target);
+	}
+	
+	this.update = function(newElement){
+		this.Element = newElement;
+		this.Element.updateAll();
+	}
+	
+	
+	
+	this.init(target);
+	
 }
